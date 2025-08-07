@@ -54,6 +54,7 @@
 
 <div id="shellMessages" style="margin-top: 2rem; background: #f4f4f4; padding: 1rem; border: 1px solid #ccc;">
   <h2>📨 Mensajes enviados al Shell</h2>
+  <button onclick="clearMessages()">Limpiar mensajes</button>
   <ul id="messagesList" style="padding-left: 1rem;"></ul>
 </div>
 
@@ -87,6 +88,13 @@
       const letter = document.getElementById('guessLetterInput').value;
       if (letter && /^[a-zA-Z]$/.test(letter)) {
         agentletEl.onToolCall('agentlet_guessLetter', { letter: letter.toLowerCase() });
+      }
+    }
+
+    function clearMessages() {
+      const messagesList = document.getElementById('messagesList');
+      if (messagesList) {
+        messagesList.innerHTML = '';
       }
     }
   </script>
