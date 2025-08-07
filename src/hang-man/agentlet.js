@@ -1,6 +1,3 @@
-
-
-
 import { Agentlet } from '../lib/agentlet-1.0.0.js';
 
 class HangmanAgentlet extends Agentlet {
@@ -117,6 +114,13 @@ class HangmanAgentlet extends Agentlet {
                     status: 'ERROR',
                     message: 'Parámetro "word" faltante o inválido.'
                 };
+            case 'agentlet_resetGame':
+                this._resetGame();
+                return {
+                    status: 'OK',
+                    message: 'Juego reiniciado.',
+                    response: {}
+                };
             default:
                 return {
                     status: 'ERROR',
@@ -132,6 +136,7 @@ class HangmanAgentlet extends Agentlet {
         this._remainingAttempts = this._maxAttempts;
         this._gameOver = false;
         this._aiTurn = false;
+        this._sendMessage("Comienza el turno del usuario.");
         this.render();
     }
 
@@ -142,7 +147,19 @@ class HangmanAgentlet extends Agentlet {
         this._remainingAttempts = this._maxAttempts;
         this._gameOver = false;
         this._aiTurn = true;
+        this._sendMessage("Comienza el turno de la IA.");
         this.render();
+    }
+
+    _resetGame() {
+        this._secretWord = '';
+        this._guessedLetters.clear();
+        this._incorrectLetters.clear();
+        this._remainingAttempts = this._maxAttempts;
+        this._gameOver = false;
+        this._aiTurn = false;
+        this.render();
+        this._sendMessage("Juego reiniciado. A la espera de que se inicie un turno.");
     }
 
     _processAIGuess(letter) {

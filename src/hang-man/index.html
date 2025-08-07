@@ -17,6 +17,9 @@
           li.textContent = parsed.message;
           messagesList.appendChild(li);
         }
+        if (typeof updateStatusFromMessage === 'function') {
+          updateStatusFromMessage(parsed.message);
+        }
       },
     };
   </script>
@@ -38,6 +41,17 @@
       background: #fff;
       box-shadow: 0 6px 20px rgba(0,0,0,0.08);
     }
+    .status-center {
+      text-align: center;
+      margin: 0;
+    }
+    .top-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -45,6 +59,10 @@
   <h1>🔤 Juego del Ahorcado (Agentlet)</h1>
   <p>Presiona teclas para adivinar la palabra secreta. O deja que la IA adivine la tuya usando herramientas.</p>
 
+  <h2 id="statusTitle" class="status-center">Estado: —</h2>
+  <div class="top-controls">
+    <button onclick="resetGame()">Reiniciar</button>
+  </div>
 
   <div class="agentlet-wrapper">
     <div class="agentlet-frame">
@@ -88,6 +106,26 @@
       const letter = document.getElementById('guessLetterInput').value;
       if (letter && /^[a-zA-Z]$/.test(letter)) {
         agentletEl.onToolCall('agentlet_guessLetter', { letter: letter.toLowerCase() });
+      }
+    }
+
+    function resetGame() {
+      if (agentletEl && typeof agentletEl.onToolCall === 'function') {
+        agentletEl.onToolCall('agentlet_resetGame', {});
+      }
+      const title = document.getElementById('statusTitle');
+      if (title) title.textContent = 'Estado: Esperando inicio de turno';
+    }
+
+    function updateStatusFromMessage(text) {
+      const title = document.getElementById('statusTitle');
+      if (!title || !text) return;
+      if (text.includes('Comienza el turno del usuario')) {
+        title.textContent = 'Estado: Turno del usuario';
+      } else if (text.includes('Comienza el turno de la IA')) {
+        title.textContent = 'Estado: Turno de la IA';
+      } else if (text.includes('adivinó correctamente') || text.includes('falló')) {
+        title.textContent = 'Estado: Partida terminada';
       }
     }
 
