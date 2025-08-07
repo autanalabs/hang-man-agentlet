@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hangman Agentlet</title>
+  <script>
+    window.agentlet_shell = {
+      registerAgentlet: (manifest) => {
+        console.log("registerAgentlet:", manifest);
+      },
+      sendMessageToShell: (msg) => {
+        const parsed = JSON.parse(msg);
+        console.log("Mensaje al Shell:", parsed.message);
+        const messagesList = document.getElementById("messagesList");
+        if (messagesList) {
+          const li = document.createElement("li");
+          li.textContent = parsed.message;
+          messagesList.appendChild(li);
+        }
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔤 Juego del Ahorcado (Agentlet)</h1>
+  <p>Presiona teclas para adivinar la palabra secreta. O deja que la IA adivine la tuya usando herramientas.</p>
+
+
+<io-ggobuk-hangman-hangman-game-0-1-0></io-ggobuk-hangman-hangman-game-0-1-0>
+
+<div id="shellMessages" style="margin-top: 2rem; background: #f4f4f4; padding: 1rem; border: 1px solid #ccc;">
+  <h2>📨 Mensajes enviados al Shell</h2>
+  <ul id="messagesList" style="padding-left: 1rem;"></ul>
+</div>
+
+  <section style="margin-top: 2rem;">
+    <h2>🧪 Simulación de tools (Turno de la IA)</h2>
+
+    <div>
+      <label>Palabra secreta para que la IA la adivine:</label><br>
+      <input id="secretWordInput" type="text" />
+      <button onclick="submitSecretWord()">Enviar palabra secreta</button>
+    </div>
+
+    <div style="margin-top: 1rem;">
+      <label>Letra a adivinar por la IA:</label><br>
+      <input id="guessLetterInput" type="text" maxlength="1" />
+      <button onclick="guessLetter()">Adivinar letra</button>
+    </div>
+  </section>
+
+  <script>
+    const agentletEl = document.querySelector('io-ggobuk-hangman-hangman-game-0-1-0');
+
+    function submitSecretWord() {
+      const word = document.getElementById('secretWordInput').value;
+      if (word) {
+        agentletEl.onToolCall('agentlet_submitSecretWord', { word });
+      }
+    }
+
+    function guessLetter() {
+      const letter = document.getElementById('guessLetterInput').value;
+      if (letter && /^[a-zA-Z]$/.test(letter)) {
+        agentletEl.onToolCall('agentlet_guessLetter', { letter: letter.toLowerCase() });
+      }
+    }
+  </script>
+
+  <script type="module" src="agentlet.js"></script>
+</body>
+</html>

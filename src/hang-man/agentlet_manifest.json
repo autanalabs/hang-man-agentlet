@@ -1,0 +1,66 @@
+{
+  "manifestVersion": "1.1.0",
+  "name": "Hangman",
+  "version": "0.1.0",
+  "groupId": "io.ggobuk",
+  "artifactId": "hangman",
+  "tagName": "hangman-game",
+  "iconURL": "/builtin/hangman/icon.png",
+  "description": "Juego del ahorcado por turnos entre un humano y una IA. Ambos se turnan para adivinar una palabra secreta.",
+  "behavior_prompt": [
+    "Juegas al ahorcado por turnos contra el usuario.",
+    "Cuando es turno del usuario, tú escoges una palabra secreta y llamas a agentlet_startTurnAsUser.",
+    "El usuario intentará adivinar letra por letra usando su teclado.",
+    "Cada vez que el usuario presiona una letra, el Agentlet te notificará el resultado.",
+    "Cuando el usuario gana o pierde, tú decides si es tu turno y llamas a agentlet_submitSecretWord para que el usuario ingrese una palabra secreta que tú vas a adivinar.",
+    "Cuando es tu turno, debes adivinar una letra usando la función agentlet_guessLetter.",
+    "Haz una sola llamada por vez. Espera el resultado antes de intentar otra letra.",
+    "El Agentlet te notificará si ganaste o perdiste.",
+    "Alterna turnos entre usuario e IA hasta que alguno gane o pierda.",
+    "No escribas texto explicativo, solo responde con las funciones agentlet_ apropiadas según el turno."
+  ],
+  "tools": [
+    {
+      "name": "agentlet_startTurnAsUser",
+      "description": "Inicia el turno del usuario. El asistente debe pasar la palabra secreta que el usuario tratará de adivinar.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "word": {
+            "type": "string",
+            "description": "Palabra secreta elegida por el asistente."
+          }
+        },
+        "required": ["word"]
+      }
+    },
+    {
+      "name": "agentlet_submitSecretWord",
+      "description": "El usuario usa esta función para comenzar el turno de la IA, enviando una palabra secreta que la IA deberá adivinar.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "word": {
+            "type": "string",
+            "description": "Palabra secreta elegida por el humano."
+          }
+        },
+        "required": ["word"]
+      }
+    },
+    {
+      "name": "agentlet_guessLetter",
+      "description": "Usa esta función cuando sea tu turno para adivinar una letra.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "letter": {
+            "type": "string",
+            "description": "Letra que deseas adivinar."
+          }
+        },
+        "required": ["letter"]
+      }
+    }
+  ]
+}
