@@ -250,11 +250,28 @@ class HangmanAgentlet extends Agentlet {
                 .keyboard { margin-top: 16px; display: grid; grid-template-columns: repeat(14, 1fr); gap: 6px; }
                 .key { padding: 8px 6px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; background: #f9f9f9; }
                 .key[disabled] { opacity: 0.5; cursor: not-allowed; }
+                .agentlet-wrapper {
+                    display: flex;
+                    justify-content: center;
+                    margin-top: 24px;
+                }
+                .agentlet-frame {
+                    display: inline-block;
+                    padding: 16px 24px;
+                    border: 2px solid #d9d9d9;
+                    border-radius: 10px;
+                    background: #fff;
+                    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+                }
             </style>
-            <div class="word">${masked}</div>
-            <div class="info">Letras incorrectas: ${incorrect || '—'}</div>
-            <div class="info">Intentos restantes: ${this._remainingAttempts}</div>
-            ${keyboardHTML}
+            <div class="agentlet-wrapper">
+                <div class="agentlet-frame">
+                    <div class="word">${masked}</div>
+                    <div class="info">Letras incorrectas: ${incorrect || '—'}</div>
+                    <div class="info">Intentos restantes: ${this._remainingAttempts}</div>
+                    ${keyboardHTML}
+                </div>
+            </div>
         `;
         if (isUserTurn) {
             this.shadowRoot.querySelectorAll('.key').forEach(btn => {
