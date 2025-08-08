@@ -243,6 +243,18 @@ class HangmanAgentlet extends Agentlet {
             </div>
         ` : '';
 
+        // Compute statusText as per instructions
+        let statusText = '';
+        if (this._gameOver) {
+            statusText = "Partida terminada";
+        } else if (this._aiTurn) {
+            statusText = "Turno de la IA";
+        } else if (this._secretWord) {
+            statusText = "Turno del usuario";
+        } else {
+            statusText = "Esperando inicio";
+        }
+
         this.shadowRoot.innerHTML = `
             <style>
                 .word { font-size: 32px; letter-spacing: 8px; text-align: center; }
@@ -263,9 +275,28 @@ class HangmanAgentlet extends Agentlet {
                     background: #fff;
                     box-shadow: 0 6px 20px rgba(0,0,0,0.08);
                 }
+                .status-center {
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 18px;
+                    margin-bottom: 8px;
+                }
+                .top-controls {
+                    text-align: center;
+                    margin-bottom: 16px;
+                }
+                .top-controls button {
+                    padding: 6px 12px;
+                    font-size: 14px;
+                    cursor: pointer;
+                }
             </style>
             <div class="agentlet-wrapper">
                 <div class="agentlet-frame">
+                    <div class="status-center">Estado: ${statusText}</div>
+                    <div class="top-controls">
+                        <button id="resetBtn">Reiniciar</button>
+                    </div>
                     <div class="word">${masked}</div>
                     <div class="info">Letras incorrectas: ${incorrect || '—'}</div>
                     <div class="info">Intentos restantes: ${this._remainingAttempts}</div>
@@ -279,6 +310,13 @@ class HangmanAgentlet extends Agentlet {
                     const letter = btn.getAttribute('data-letter');
                     this._handleVirtualKey(letter);
                 });
+            });
+        }
+        // Attach click listener to reset button
+        const resetBtn = this.shadowRoot.getElementById('resetBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                this.onToolCall('agentlet_resetGame', {});
             });
         }
     }
