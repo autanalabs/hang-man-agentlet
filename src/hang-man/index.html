@@ -29,28 +29,12 @@
       margin: 40px;
     }
    
-    .status-center {
-      text-align: center;
-      margin: 0;
-    }
-    .top-controls {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 8px;
-      margin-bottom: 8px;
-    }
   </style>
 </head>
 <body>
 
   <h1>🔤 Juego del Ahorcado (Agentlet)</h1>
   <p>Presiona teclas para adivinar la palabra secreta. O deja que la IA adivine la tuya usando herramientas.</p>
-
-  <h2 id="statusTitle" class="status-center">Estado: —</h2>
-  <div class="top-controls">
-    <button onclick="resetGame()">Reiniciar</button>
-  </div>
 
  
   <io-ggobuk-hangman-hangman-game-0-1-1></io-ggobuk-hangman-hangman-game-0-1-1>
@@ -160,20 +144,6 @@
           li.textContent = `respuesta de la tool call: ${res.status} - ${res.message}`;
           document.getElementById("messagesList").appendChild(li);
         }
-      }
-      const title = document.getElementById('statusTitle');
-      if (title) title.textContent = 'Estado: Esperando inicio de turno';
-    }
-
-    function updateStatusFromMessage(text) {
-      const title = document.getElementById('statusTitle');
-      if (!title || !text) return;
-      if (text.includes('Comienza el turno del usuario')) {
-        title.textContent = 'Estado: Turno del usuario';
-      } else if (text.includes('Comienza el turno de la IA')) {
-        title.textContent = 'Estado: Turno de la IA';
-      } else if (text.includes('adivinó correctamente') || text.includes('falló')) {
-        title.textContent = 'Estado: Partida terminada';
       }
     }
 

@@ -266,6 +266,7 @@ class HangmanAgentlet extends Agentlet {
                     display: flex;
                     justify-content: center;
                     margin-top: 24px;
+                    background-color: #fff;
                 }
                 .agentlet-frame {
                     display: inline-block;
