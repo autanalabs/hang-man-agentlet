@@ -6,29 +6,30 @@
   "artifactId": "hangman",
   "tagName": "hangman-game",
   "iconURL": "/builtin/hangman/icon.png",
-  "description": "Juego del ahorcado por turnos entre un humano y una IA. Ambos se turnan para adivinar una palabra secreta.",
+  "description": "Juego del ahorcado por turnos entre un humano y una IA. El usuario juega con un teclado virtual cuando es su turno; la IA adivina por medio de tools.",
   "behavior_prompt": [
     "Juegas al ahorcado por turnos contra el usuario.",
-    "Cuando es turno del usuario, tú escoges una palabra secreta y llamas a agentlet_startTurnAsUser.",
-    "El usuario intentará adivinar letra por letra usando su teclado.",
-    "Cada vez que el usuario presiona una letra, el Agentlet te notificará el resultado.",
-    "Cuando el usuario gana o pierde, tú decides si es tu turno y llamas a agentlet_submitSecretWord para que el usuario ingrese una palabra secreta que tú vas a adivinar.",
-    "Cuando es tu turno, debes adivinar una letra usando la función agentlet_guessLetter.",
-    "Haz una sola llamada por vez. Espera el resultado antes de intentar otra letra.",
-    "El Agentlet te notificará si ganaste o perdiste.",
-    "Alterna turnos entre usuario e IA hasta que alguno gane o pierda.",
-    "No escribas texto explicativo, solo responde con las funciones agentlet_ apropiadas según el turno."
+    "Todos los mensajes que recibes del Agentlet llegan como texto natural dentro del campo 'message'. Interprétalos para decidir la siguiente acción.",
+    "Cuando sea turno del usuario: el asistente debe escoger una palabra secreta (solo letras, puede incluir ñ y tildes) y llamar a agentlet_startTurnAsUser con {word}.",
+    "Durante el turno del usuario, el Agentlet muestra un teclado virtual y te notificará por mensaje natural si cada letra fue correcta, incorrecta, repetida, si ganó o si perdió.",
+    "Cuando el usuario gana o pierde, inicia tu propio turno llamando a agentlet_submitSecretWord y espera a que el usuario ingrese su palabra secreta.",
+    "Cuando sea tu turno (IA): adivina una sola letra por vez llamando a agentlet_guessLetter con {letter}. Espera la respuesta del Agentlet antes de hacer otra jugada.",
+    "No intentes adivinar palabras completas; sólo letras individuales.",
+    "Si detectas que ganaste o perdiste (por los mensajes del Agentlet), anuncia el resultado con un breve texto y ofrece reiniciar llamando a agentlet_resetGame si el usuario quiere jugar de nuevo.",
+    "Evita texto explicativo innecesario; cuando corresponda, responde sólo con las funciones agentlet_ adecuadas.",
+    "Cumple estrictamente el turno actual: no llames a tools del turno contrario."
   ],
   "tools": [
     {
       "name": "agentlet_startTurnAsUser",
-      "description": "Inicia el turno del usuario. El asistente debe pasar la palabra secreta que el usuario tratará de adivinar.",
+      "description": "Inicia el turno del usuario. El asistente debe pasar la palabra secreta que el usuario intentará adivinar con el teclado virtual.",
       "parameters": {
         "type": "object",
         "properties": {
           "word": {
             "type": "string",
-            "description": "Palabra secreta elegida por el asistente."
+            "description": "Palabra secreta elegida por el asistente (solo letras; permite ñ y tildes).",
+            "pattern": "^[A-Za-zñÑáéíóúÁÉÍÓÚ]+$"
           }
         },
         "required": ["word"]
@@ -36,13 +37,14 @@
     },
     {
       "name": "agentlet_submitSecretWord",
-      "description": "El usuario usa esta función para comenzar el turno de la IA, enviando una palabra secreta que la IA deberá adivinar.",
+      "description": "Comienza el turno de la IA: el usuario proporciona la palabra secreta sin revelarla al asistente.",
       "parameters": {
         "type": "object",
         "properties": {
           "word": {
             "type": "string",
-            "description": "Palabra secreta elegida por el humano."
+            "description": "Palabra secreta elegida por el humano (solo letras; permite ñ y tildes).",
+            "pattern": "^[A-Za-zñÑáéíóúÁÉÍÓÚ]+$"
           }
         },
         "required": ["word"]
@@ -50,16 +52,25 @@
     },
     {
       "name": "agentlet_guessLetter",
-      "description": "Usa esta función cuando sea tu turno para adivinar una letra.",
+      "description": "Usa esta función en el turno de la IA para adivinar una sola letra.",
       "parameters": {
         "type": "object",
         "properties": {
           "letter": {
             "type": "string",
-            "description": "Letra que deseas adivinar."
+            "description": "Letra a adivinar (una sola; permite ñ y tildes).",
+            "pattern": "^[A-Za-zñÑáéíóúÁÉÍÓÚ]$"
           }
         },
         "required": ["letter"]
+      }
+    },
+    {
+      "name": "agentlet_resetGame",
+      "description": "Reinicia el estado del juego en el Agentlet y deja todo listo para iniciar un nuevo turno.",
+      "parameters": {
+        "type": "object",
+        "properties": {}
       }
     }
   ]

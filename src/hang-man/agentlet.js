@@ -22,30 +22,25 @@ class HangmanAgentlet extends Agentlet {
         this._remainingAttempts = this._maxAttempts;
         this._gameOver = false;
         this._aiTurn = false;
-
-        this._handleKeyUp = this._handleKeyUp.bind(this);
     }
 
     connectedCallback() {
         super.connectedCallback();
-        window.addEventListener('keyup', this._handleKeyUp);
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        window.removeEventListener('keyup', this._handleKeyUp);
     }
 
-    _handleKeyUp(event) {
-        if (this._gameOver || !this._secretWord || this._aiTurn) return;
 
-        const key = event.key.toLowerCase();
-        if (!/^[a-z]$/.test(key)) return;
+    _handleVirtualKey(letter) {
+        if (this._gameOver || !this._secretWord || this._aiTurn) return;
+        const key = String(letter).toLowerCase();
+        if (!/^[a-zñáéíóú]$/.test(key)) return;
         if (this._guessedLetters.has(key) || this._incorrectLetters.has(key)) {
             this._sendMessage(`El usuario ya había intentado la letra '${key}'. Ignorada.`);
             return;
         }
-
         if (this._secretWord.includes(key)) {
             this._guessedLetters.add(key);
             this._sendMessage(`El usuario presionó la letra '${key}', y fue correcta.`);
@@ -54,7 +49,6 @@ class HangmanAgentlet extends Agentlet {
             this._remainingAttempts--;
             this._sendMessage(`El usuario presionó la letra '${key}', y fue incorrecta. Le quedan ${this._remainingAttempts} intentos.`);
         }
-
         this.render();
         this._checkGameStatus();
     }
@@ -83,6 +77,7 @@ class HangmanAgentlet extends Agentlet {
             case 'agentlet_startTurnAsUser':
                 if (params && typeof params.word === 'string') {
                     this._startGame(params.word.toLowerCase());
+                    this._aiTurn = false;
                     return {
                         status: 'OK',
                         message: 'Juego iniciado. Turno del usuario.',
@@ -104,6 +99,7 @@ class HangmanAgentlet extends Agentlet {
             case 'agentlet_submitSecretWord':
                 if (params && typeof params.word === 'string') {
                     this._startGameAsAI(params.word.toLowerCase());
+                    this._aiTurn = true;
                     return {
                         status: 'OK',
                         message: 'Juego iniciado. Turno de la IA.',
@@ -218,15 +214,38 @@ class HangmanAgentlet extends Agentlet {
 
         const incorrect = Array.from(this._incorrectLetters).join(', ');
 
+        const isUserTurn = !this._aiTurn && !!this._secretWord && !this._gameOver;
+        const keys = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','ñ','o','p','q','r','s','t','u','v','w','x','y','z'];
+        const keyboardHTML = isUserTurn ? `
+            <div class="keyboard">
+                ${keys.map(k => {
+                    const disabled = this._guessedLetters.has(k) || this._incorrectLetters.has(k) ? 'disabled' : '';
+                    return `<button class="key" data-letter="${k}" ${disabled}>${k.toUpperCase()}</button>`;
+                }).join('')}
+            </div>
+        ` : '';
+
         this.shadowRoot.innerHTML = `
             <style>
-                .word { font-size: 32px; letter-spacing: 8px; }
-                .info { margin-top: 10px; font-size: 18px; }
+                .word { font-size: 32px; letter-spacing: 8px; text-align: center; }
+                .info { margin-top: 10px; font-size: 18px; text-align: center; }
+                .keyboard { margin-top: 16px; display: grid; grid-template-columns: repeat(14, 1fr); gap: 6px; }
+                .key { padding: 8px 6px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; background: #f9f9f9; }
+                .key[disabled] { opacity: 0.5; cursor: not-allowed; }
             </style>
             <div class="word">${masked}</div>
-            <div class="info">Letras incorrectas: ${incorrect}</div>
+            <div class="info">Letras incorrectas: ${incorrect || '—'}</div>
             <div class="info">Intentos restantes: ${this._remainingAttempts}</div>
+            ${keyboardHTML}
         `;
+        if (isUserTurn) {
+            this.shadowRoot.querySelectorAll('.key').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const letter = btn.getAttribute('data-letter');
+                    this._handleVirtualKey(letter);
+                });
+            });
+        }
     }
 }
 

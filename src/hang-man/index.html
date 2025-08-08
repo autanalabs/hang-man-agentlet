@@ -92,6 +92,19 @@
     </div>
   </section>
 
+  <section style="margin-top: 2rem;">
+    <h2>🧪 Simulación de tools (Turno del usuario)</h2>
+
+    <div>
+      <label>Palabra secreta que la IA (asistente) proveerá al Agentlet:</label><br>
+      <input id="userTurnWordInput" type="text" />
+      <button onclick="startUserTurn()">Iniciar turno del usuario</button>
+      <button onclick="startUserTurnRandom()" title="Usa una palabra aleatoria de ejemplo">Usar palabra aleatoria</button>
+    </div>
+
+    <p style="margin-top: 8px; color: #555;">Luego, presiona letras en tu teclado para intentar adivinar.</p>
+  </section>
+
   <script>
     const agentletEl = document.querySelector('io-ggobuk-hangman-hangman-game-0-1-0');
 
@@ -107,6 +120,20 @@
       if (letter && /^[a-zA-Z]$/.test(letter)) {
         agentletEl.onToolCall('agentlet_guessLetter', { letter: letter.toLowerCase() });
       }
+    }
+
+    function startUserTurn() {
+      const word = document.getElementById('userTurnWordInput').value;
+      if (word) {
+        agentletEl.onToolCall('agentlet_startTurnAsUser', { word });
+      }
+    }
+
+    function startUserTurnRandom() {
+      const samples = ['gato','perro','sol','luna','casa','árbol','nube','coche','raton','flor'];
+      const pick = samples[Math.floor(Math.random() * samples.length)];
+      document.getElementById('userTurnWordInput').value = pick;
+      agentletEl.onToolCall('agentlet_startTurnAsUser', { word: pick });
     }
 
     function resetGame() {
