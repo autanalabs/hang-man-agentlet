@@ -88,6 +88,7 @@ class HangmanAgentlet extends Agentlet {
                     status: 'ERROR',
                     message: 'Parámetro "word" faltante o inválido.'
                 };
+            case 'guessLetter':
             case 'agentlet_guessLetter':
                 if (params && typeof params.letter === 'string') {
                     return this._processAIGuess(params.letter.toLowerCase());
@@ -96,6 +97,7 @@ class HangmanAgentlet extends Agentlet {
                     status: 'ERROR',
                     message: 'Parámetro "letter" faltante o inválido.'
                 };
+            case 'submitSecretWord':
             case 'agentlet_submitSecretWord':
                 if (params && typeof params.word === 'string') {
                     this._startGameAsAI(params.word.toLowerCase());
@@ -110,6 +112,7 @@ class HangmanAgentlet extends Agentlet {
                     status: 'ERROR',
                     message: 'Parámetro "word" faltante o inválido.'
                 };
+            case 'resetGame':
             case 'agentlet_resetGame':
                 this._resetGame();
                 return {
