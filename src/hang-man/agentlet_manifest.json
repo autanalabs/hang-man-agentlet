@@ -1,7 +1,7 @@
 {
   "manifestVersion": "1.1.0",
   "name": "Hangman",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "groupId": "io.ggobuk",
   "artifactId": "hangman",
   "tagName": "hangman-game",

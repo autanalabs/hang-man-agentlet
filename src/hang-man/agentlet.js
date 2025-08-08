@@ -6,7 +6,7 @@ class HangmanAgentlet extends Agentlet {
         return {
             manifestVersion: "1.1.0-mini",
             name: "Hangman",
-            version: "0.1.0",
+            version: "0.1.1",
             groupId: "io.ggobuk",
             artifactId: "hangman",
             tagName: "hangman-game"
@@ -135,7 +135,6 @@ class HangmanAgentlet extends Agentlet {
         this._remainingAttempts = this._maxAttempts;
         this._gameOver = false;
         this._aiTurn = false;
-        this._sendMessage("Comienza el turno del usuario.");
         this.render();
     }
 
@@ -146,7 +145,6 @@ class HangmanAgentlet extends Agentlet {
         this._remainingAttempts = this._maxAttempts;
         this._gameOver = false;
         this._aiTurn = true;
-        this._sendMessage("Comienza el turno de la IA.");
         this.render();
     }
 
@@ -158,7 +156,6 @@ class HangmanAgentlet extends Agentlet {
         this._gameOver = false;
         this._aiTurn = false;
         this.render();
-        this._sendMessage("Juego reiniciado. A la espera de que se inicie un turno.");
     }
 
     _processAIGuess(letter) {
@@ -176,34 +173,52 @@ class HangmanAgentlet extends Agentlet {
             };
         }
 
+        let correctness;
         if (this._secretWord.includes(letter)) {
             this._guessedLetters.add(letter);
-            this._sendMessage(`La IA adivinó la letra '${letter}', y fue correcta.`);
+            correctness = 'correcta';
         } else {
             this._incorrectLetters.add(letter);
             this._remainingAttempts--;
-            this._sendMessage(`La IA adivinó la letra '${letter}', y fue incorrecta. Le quedan ${this._remainingAttempts} intentos.`);
+            correctness = 'incorrecta';
         }
 
         this.render();
-        return this._checkAIGameStatus();
+        const statusInfo = this._checkAIGameStatus();
+
+        // Armar mensaje único para la tool_response
+        let msg = `La IA intentó la letra '${letter}', y fue ${correctness}.`;
+        msg += ` Intentos restantes: ${this._remainingAttempts}.`;
+        if (statusInfo.gameOver) {
+            msg += statusInfo.won ? ` ¡La IA adivinó la palabra secreta '${this._secretWord}'!`
+                                  : ` La IA falló. La palabra secreta era '${this._secretWord}'.`;
+        }
+
+        return {
+            status: 'OK',
+            message: msg,
+            response: {
+                gameOver: statusInfo.gameOver,
+                won: !!statusInfo.won,
+                remainingAttempts: this._remainingAttempts,
+                guessedLetters: Array.from(this._guessedLetters),
+                incorrectLetters: Array.from(this._incorrectLetters),
+                masked: this._secretWord.split('').map(ch => this._guessedLetters.has(ch) ? ch : '_').join(' ')
+            }
+        };
     }
 
     _checkAIGameStatus() {
         const revealed = this._secretWord.split('').every(char => this._guessedLetters.has(char));
         if (revealed) {
             this._gameOver = true;
-            this._sendMessage(`¡La IA adivinó correctamente la palabra secreta '${this._secretWord}'!`);
-        } else if (this._remainingAttempts <= 0) {
-            this._gameOver = true;
-            this._sendMessage(`La IA falló. La palabra secreta era '${this._secretWord}'.`);
+            return { gameOver: true, won: true };
         }
-
-        return {
-            status: 'OK',
-            message: 'Estado actualizado.',
-            response: {}
-        };
+        if (this._remainingAttempts <= 0) {
+            this._gameOver = true;
+            return { gameOver: true, won: false };
+        }
+        return { gameOver: false };
     }
 
     onMessageFromShell(message) {
