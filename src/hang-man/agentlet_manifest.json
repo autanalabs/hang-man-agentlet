@@ -4,7 +4,7 @@
   "version": "0.1.1",
   "groupId": "io.ggobuk",
   "artifactId": "hangman",
-  "tagName": "hangman-game",
+  "tagName": "hang-man",
   "iconURL": "./icon.png",
   "description": "Juego del ahorcado por turnos entre un humano y una IA. El usuario juega con un teclado virtual cuando es su turno; la IA adivina por medio de tools.",
   "behavior_prompt": [
