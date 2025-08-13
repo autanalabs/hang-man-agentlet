@@ -9,7 +9,7 @@ class HangmanAgentlet extends Agentlet {
             version: "0.1.1",
             groupId: "io.ggobuk",
             artifactId: "hangman",
-            tagName: "hangman-game"
+            tagName: "hang-man"
         };
     }
 
